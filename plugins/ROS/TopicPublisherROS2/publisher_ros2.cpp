@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <QMessageBox>
 #include <tf2_ros/qos.hpp>
-#include <rosbag2/types.hpp>
+#include <rosbag2_cpp/types.hpp>
 #include <rmw/rmw.h>
 #include <rmw/types.h>
 #include "publisher_select_dialog.h"
@@ -94,7 +94,7 @@ void TopicPublisherROS2::setEnabled(bool to_enable)
 
   if (_enabled)
   {
-    auto metadata_it = _datamap->user_defined.find("rosbag2::plotjuggler::topics_metadata");
+    auto metadata_it = _datamap->user_defined.find("rosbag2_cpp::plotjuggler::topics_metadata");
     if (metadata_it == _datamap->user_defined.end())
     {
       return;
@@ -135,7 +135,7 @@ void TopicPublisherROS2::setEnabled(bool to_enable)
 
 void TopicPublisherROS2::filterDialog()
 {
-  auto metadata_it = _datamap->user_defined.find("rosbag2::plotjuggler::topics_metadata");
+  auto metadata_it = _datamap->user_defined.find("rosbag2_cpp::plotjuggler::topics_metadata");
   if (metadata_it != _datamap->user_defined.end())
   {
     // I stored it in a one point timeseries... shoot me
@@ -311,7 +311,7 @@ void TopicPublisherROS2::updateState(double current_time)
   broadcastTF(current_time);
   //-----------------------------------------------
 
-  auto data_it = _datamap->user_defined.find("rosbag2::plotjuggler::consecutive_messages");
+  auto data_it = _datamap->user_defined.find("rosbag2_cpp::plotjuggler::consecutive_messages");
   if (data_it != _datamap->user_defined.end())
   {
     const PlotDataAny& continuous_msgs = data_it->second;

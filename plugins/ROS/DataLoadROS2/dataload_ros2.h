@@ -5,7 +5,7 @@
 #include <QtPlugin>
 #include <QSettings>
 
-#include <rosbag2/readers/sequential_reader.hpp>
+#include <rosbag2_cpp/readers/sequential_reader.hpp>
 #include "PlotJuggler/optional.hpp"
 #include "PlotJuggler/dataloader_base.h"
 #include "ros2_parsers/ros2_parser.h"
@@ -37,7 +37,7 @@ public:
   virtual bool xmlLoadState(const QDomElement& parent_element) override;
 
 private:
-  std::shared_ptr<rosbag2::readers::SequentialReader> _bag_reader;
+  std::shared_ptr<rosbag2_cpp::readers::SequentialReader> _bag_reader;
 
   PlotDataMapRef _temp_plot_map;
 

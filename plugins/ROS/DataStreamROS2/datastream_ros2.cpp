@@ -184,7 +184,7 @@ void DataStreamROS2::subscribeToTopic(const std::string& topic_name, const std::
 
   _parser->registerMessageType(topic_name, topic_type);
 
-  auto bound_callback = [=](std::shared_ptr<rmw_serialized_message_t> msg) { messageCallback(topic_name, msg); };
+  auto bound_callback = [=](std::shared_ptr<rclcpp::SerializedMessage> msg) { messageCallback(topic_name, msg); };
 
   // double subscription, latching or not
   for (bool transient : { true, false })
@@ -197,12 +197,12 @@ void DataStreamROS2::subscribeToTopic(const std::string& topic_name, const std::
   }
 }
 
-void DataStreamROS2::messageCallback(const std::string& topic_name, std::shared_ptr<rmw_serialized_message_t> msg)
+void DataStreamROS2::messageCallback(const std::string& topic_name, std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   double timestamp = _node->get_clock()->now().seconds();
 
   std::unique_lock<std::mutex> lock(mutex());
-  _parser->parseMessage(topic_name, msg.get(), timestamp);
+  _parser->parseMessage(topic_name, &(msg.get()->get_rcl_serialized_message()), timestamp);
 }
 
 void DataStreamROS2::saveDefaultSettings()

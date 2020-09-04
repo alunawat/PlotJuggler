@@ -17,8 +17,8 @@
 #include <rosidl_typesupport_introspection_cpp/message_introspection.hpp>
 #include <rosidl_typesupport_introspection_cpp/field_types.hpp>
 #include <rosidl_typesupport_cpp/identifier.hpp>
-#include <rosbag2/typesupport_helpers.hpp>
-#include <rosbag2/types/introspection_message.hpp>
+#include <rosbag2_cpp/typesupport_helpers.hpp>
+#include <rosbag2_cpp/types/introspection_message.hpp>
 #include <unordered_map>
 #include <rclcpp/rclcpp.hpp>
 #include <rmw/rmw.h>
@@ -40,7 +40,7 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
 {
   auto metadata_io = std::make_unique<rosbag2_storage::MetadataIo>();
 
-  auto temp_bag_reader = std::make_shared<rosbag2::readers::SequentialReader>();
+  auto temp_bag_reader = std::make_shared<rosbag2_cpp::readers::SequentialReader>();
 
   QString bagDir;
   {
@@ -48,10 +48,10 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
     bagDir = finfo.dir().path();
   }
 
-  rosbag2::StorageOptions storageOptions;
+  rosbag2_cpp::StorageOptions storageOptions;
   storageOptions.uri = bagDir.toStdString();
   storageOptions.storage_id = "sqlite3";
-  rosbag2::ConverterOptions converterOptions;
+  rosbag2_cpp::ConverterOptions converterOptions;
   converterOptions.input_serialization_format = "cdr";
   converterOptions.output_serialization_format = rmw_get_serialization_format();
 
@@ -72,7 +72,7 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
   QDir::setCurrent(oldPath);
 
   // Temporarily change the current directory as a workaround for rosbag2 relative directories not working properly
-  std::vector<rosbag2::TopicMetadata> topic_metadata = temp_bag_reader->get_all_topics_and_types();
+  std::vector<rosbag2_storage::TopicMetadata> topic_metadata = temp_bag_reader->get_all_topics_and_types();
 
   std::unordered_map<std::string, std::string> topicTypesByName;
 
@@ -80,7 +80,7 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
 
   std::vector<TopicInfo> topics_info;
 
-  for (const rosbag2::TopicMetadata& topic : topic_metadata)
+  for (const rosbag2_storage::TopicMetadata& topic : topic_metadata)
   {
     all_topics_qt.push_back( {QString::fromStdString(topic.name),
                               QString::fromStdString(topic.type)} );
@@ -89,8 +89,13 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
     TopicInfo topic_info;
     topic_info.name = topic.name;
     topic_info.type = topic.type;
-    topic_info.type_support = rosbag2::get_typesupport(
-        topic.type, rosidl_typesupport_cpp::typesupport_identifier);
+
+    const auto& typesupport_identifier = rosidl_typesupport_cpp::typesupport_identifier;
+    const auto& typesupport_library = rosbag2_cpp::get_typesupport_library(topic.type,
+                                                                           typesupport_identifier);
+    topic_info.type_support = rosbag2_cpp::get_typesupport_handle(topic.type,
+                                                                  typesupport_identifier,
+                                                                  typesupport_library);
     topics_info.emplace_back( std::move(topic_info) );
   }
 
@@ -155,8 +160,8 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
   progress_dialog.show();
   int msg_count = 0;
 
-  PlotDataAny& plot_consecutive = plot_map.addUserDefined("rosbag2::plotjuggler::consecutive_messages")->second;
-  PlotDataAny& metadata_storage = plot_map.addUserDefined("rosbag2::plotjuggler::topics_metadata")->second;
+  PlotDataAny& plot_consecutive = plot_map.addUserDefined("rosbag2_cpp::plotjuggler::consecutive_messages")->second;
+  PlotDataAny& metadata_storage = plot_map.addUserDefined("rosbag2_cpp::plotjuggler::topics_metadata")->second;
   // dirty trick. Store it in a one point timeseries
   metadata_storage.pushBack( {0, nonstd::any(topics_info) } );
 

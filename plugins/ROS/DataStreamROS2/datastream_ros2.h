@@ -40,7 +40,7 @@ public:
   virtual void addActionsToParentMenu(QMenu* menu) override;
 
 private:
-  void messageCallback(const std::string& topic_name, std::shared_ptr<rmw_serialized_message_t> msg);
+  void messageCallback(const std::string& topic_name, std::shared_ptr<rclcpp::SerializedMessage> msg);
 
 private:
   std::shared_ptr<rclcpp::Context> _context;
