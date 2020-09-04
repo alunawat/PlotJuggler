@@ -17,14 +17,12 @@ TopicInfo::TopicInfo(const std::string& type)
 {
   topic_type = type;
 
-  const auto& introspection_identifier = rosidl_typesupport_introspection_cpp::typesupport_identifier;
-  const auto& typesupport_identifier   = rosidl_typesupport_cpp::typesupport_identifier;
+  _introspection_library = rosbag2_cpp::get_typesupport_library(type, "rosidl_typesupport_introspection_cpp");
+  introspection_support = rosbag2_cpp::get_typesupport_handle(type, "rosidl_typesupport_introspection_cpp", _introspection_library);
 
-  introspection_support = rosbag2_cpp::get_typesupport_handle(type, introspection_identifier,
-                                                              rosbag2_cpp::get_typesupport_library(type, introspection_identifier));
-
-  type_support = rosbag2_cpp::get_typesupport_handle(type, typesupport_identifier,
-                                                     rosbag2_cpp::get_typesupport_library(type, typesupport_identifier));
+  auto identifier   = rosidl_typesupport_cpp::typesupport_identifier;
+  _support_library = rosbag2_cpp::get_typesupport_library(type, identifier);
+  type_support = rosbag2_cpp::get_typesupport_handle(type, identifier, _support_library);
 
   has_header_stamp = Ros2Introspection::TypeHasHeader(introspection_support);
 }
@@ -39,17 +37,16 @@ inline T CastFromBuffer(eprosima::fastcdr::Cdr& cdr)
 
 bool TypeHasHeader(const rosidl_message_type_support_t* type_support)
 {
-  using namespace rosidl_typesupport_introspection_cpp;
-  const auto* members = static_cast<const MessageMembers*>(type_support->data);
+  auto members = static_cast<const rosidl_typesupport_introspection_cpp::MessageMembers *>(type_support->data);
 
   if (members->member_count_ >= 1 && members->members_)
   {
-    const MessageMember& first_field = members->members_[0];
+    const rosidl_typesupport_introspection_cpp::MessageMember& first_field = members->members_[0];
     if (first_field.members_ == nullptr)
     {
       return false;
     }
-    const auto* header_members = static_cast<const MessageMembers*>(first_field.members_->data);
+    const auto* header_members = static_cast<const rosidl_typesupport_introspection_cpp::MessageMembers*>(first_field.members_->data);
     if (strcmp(header_members->message_name_, "Header") == 0 && strcmp(header_members->message_namespace_, "std_msgs::"
                                                                                                            "msg") == 0)
     {

@@ -17,7 +17,7 @@
 #include "ros2_parser.h"
 #include "generic_publisher.h"
 
-using SerializedMessagePtr = std::shared_ptr<rosbag2_storage::SerializedBagMessage>;
+using SerializedMessagePtr = rosbag2_storage::SerializedBagMessage*;
 
 
 class TopicPublisherROS2 : public StatePublisher

@@ -21,6 +21,8 @@ class DataLoadROS2 : public DataLoader
 public:
   DataLoadROS2();
 
+  ~DataLoadROS2() override;
+
   virtual const std::vector<const char*>& compatibleFileExtensions() const override;
 
   virtual bool readDataFromFile(FileLoadInfo* fileload_info, PlotDataMapRef& destination) override;
@@ -29,8 +31,6 @@ public:
   {
     return "DataLoad ROS2 bags";
   }
-
-  virtual ~DataLoadROS2() override = default;
 
   virtual bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
 

@@ -31,6 +31,14 @@ DataLoadROS2::DataLoadROS2() : _parser(_temp_plot_map)
   loadDefaultSettings();
 }
 
+DataLoadROS2::~DataLoadROS2()
+{
+  if (_bag_reader)
+  {
+    _bag_reader->reset();
+  }
+}
+
 const std::vector<const char*>& DataLoadROS2::compatibleFileExtensions() const
 {
   return _extensions;
@@ -136,8 +144,8 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
   std::set<std::string> topic_selected;
   for (const auto& topic_qt : _config.selected_topics)
   {
-    const std::string topic_name = topic_qt.toStdString();
-    const std::string& topic_type = topicTypesByName.at(topic_name);
+    std::string topic_name = topic_qt.toStdString();
+    std::string topic_type = topicTypesByName.at(topic_name);
     topic_selected.insert(topic_name);
 
     _parser.registerMessageType(topic_name, topic_type);
@@ -186,7 +194,7 @@ bool DataLoadROS2::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_map
     }
 
     //---- save msg reference in PlotAny ----
-    auto data_point = PlotDataAny::Point(timestamp, nonstd::any(msg));
+    auto data_point = PlotDataAny::Point(timestamp, nonstd::any(msg.get()));
     plot_consecutive.pushBack(data_point);
 
     auto plot_pair = plot_map.user_defined.find(topic_name);

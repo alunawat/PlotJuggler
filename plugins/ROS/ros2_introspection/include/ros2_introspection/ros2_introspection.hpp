@@ -70,7 +70,11 @@ struct TopicInfo{
 
   std::string topic_type;
   bool has_header_stamp;
+
+  std::shared_ptr<rcpputils::SharedLibrary> _introspection_library;
   const rosidl_message_type_support_t *introspection_support;
+
+  std::shared_ptr<rcpputils::SharedLibrary> _support_library;
   const rosidl_message_type_support_t *type_support;
 
   static rcutils_allocator_t allocator;
